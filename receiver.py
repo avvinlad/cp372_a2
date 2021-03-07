@@ -14,8 +14,10 @@ class receiver:
     
     def getNextExpectedSeqNum(self):
         '''The expected sequence numbers are 0 or 1'''
+        
+
         return
-    
+
     
     def __init__(self, entityName, ns):
         self.entity = entityName
@@ -39,5 +41,11 @@ class receiver:
         If packet is OK (not a duplicate or corrupted), deliver it to the
         application layer and send an acknowledgement to the sender
         '''
+        # must check for duplicate or corrupted packet
+
+
+        # if everything is ok we deliver data back to sender
+        self.networkSimulator.deliverData(self.entity, packet)
+        
 
         return

@@ -1,12 +1,19 @@
 from common import *
 
+
 class sender:
     RTT = 20
+    packet = None
+    seqNum = None
+    ackNum = None
+    checkSum = None
+    payload = ''
+
     
     def isCorrupted (self, packet):
         '''Checks if a received packet (acknowledgement) has been corrupted
         during transmission.
-        Return true if computed checksum is different than packet checksum.
+        Return true if computed checksum is different than packet checksum. 
         '''
 
         return
@@ -21,8 +28,9 @@ class sender:
     def getNextSeqNum(self):
         '''generate the next sequence number to be used.
         '''
+        seq = 0
  
-        return 
+        return seq
 
     def __init__(self, entityName, ns):
         self.entity = entityName
@@ -33,6 +41,8 @@ class sender:
         '''initialize the sequence number and the packet in transit.
         Initially there is no packet is transit and it should be set to None
         '''
+        print('this is sender-init')
+
         return
 
     def timerInterrupt(self):
@@ -52,11 +62,21 @@ class sender:
         by calling calling utdSend.
         It also start the timer.
         It must ignore the message if there is one packet in transit
-        '''
+        ''' 
+        print('this is sender-output')
+        seqNum = self.getNextSeqNum()
+        checkSum = checksumCalc(message.data)
+        ackNum = 0
+        packet = Packet(seqNum, ackNum, checkSum, message.data)
+        
+        # call udtSend function with new packet
+        self.networkSimulator.udtSend(self.entity, packet)
+
+        # start the timer
+        self.networkSimulator.startTimer(self.entity, self.RTT)
 
         return
  
-    
     def input(self, packet):
 
         '''If the acknowlegement packet isn't corrupted or duplicate, 
@@ -68,5 +88,6 @@ class sender:
         not do anything and the packet will be sent again since the
         timer will be expired and timerInterrupt will be called by the simulator.
         '''
+
 
         return 
