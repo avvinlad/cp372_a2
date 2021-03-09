@@ -3,9 +3,8 @@ from common import *
 
 class sender:
     RTT = 20
-    packet = None
-    seqNum = None
-    ackNum = None
+    seqNum = 0
+    ackNum = 0
     checkSum = None
     payload = ''
 
@@ -28,9 +27,9 @@ class sender:
     def getNextSeqNum(self):
         '''generate the next sequence number to be used.
         '''
-        seq = 0
- 
-        return seq
+        seqNum = 0 if self.seqNum == 0 else 1
+
+        return seqNum
 
     def __init__(self, entityName, ns):
         self.entity = entityName
@@ -42,6 +41,7 @@ class sender:
         Initially there is no packet is transit and it should be set to None
         '''
         print('this is sender-init')
+        self.packet = None
 
         return
 
@@ -52,6 +52,7 @@ class sender:
         the timeout to be twice the RTT.
         You never call this function. It is called by the simulator.
         '''
+        print('this is sender-timerInterupt')
 
         
         return
@@ -64,13 +65,13 @@ class sender:
         It must ignore the message if there is one packet in transit
         ''' 
         print('this is sender-output')
-        seqNum = self.getNextSeqNum()
-        checkSum = checksumCalc(message.data)
-        ackNum = 0
-        packet = Packet(seqNum, ackNum, checkSum, message.data)
+        self.seqNum = self.getNextSeqNum()
+        self.ackNum = 0
+        self.checkSum = checksumCalc(message.data) + self.seqNum + self.ackNum
+        self.packet = Packet(self.seqNum, self.ackNum, self.checkSum, message.data)
         
         # call udtSend function with new packet
-        self.networkSimulator.udtSend(self.entity, packet)
+        self.networkSimulator.udtSend(self.entity, self.packet)
 
         # start the timer
         self.networkSimulator.startTimer(self.entity, self.RTT)
@@ -88,6 +89,12 @@ class sender:
         not do anything and the packet will be sent again since the
         timer will be expired and timerInterrupt will be called by the simulator.
         '''
+        print('this is sender-input')
+        self.seqNum = self.getNextSeqNum()
 
+        checkSum = checksumCalc(packet.payload) + packet.ackNum + packet.seqNum
+
+        if checkSum == packet.checksum:
+            self.networkSimulator.stopTimer(self.entity)
 
         return 

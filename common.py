@@ -4,29 +4,24 @@ TRACE = 1
 MAXDATASIZE = 20;   # This constant controls the maximum size of the buffer in a Message and in a Packet
 
 def checksumCalc(payload):
-	#The implemention of function that calculates checksum goes here
-
-	# change to bytearray
-	payload_bytes = bytearray(payload, encoding='utf-8')
-
+	# The implemention of function that calculates checksum goes here
 	total = 0
-	payload_length = len(payload_bytes)
 
-	index = 0 
-	# loop through the payload to add to total
-	while payload_length > 1:
-		total += ((payload_bytes[index+1] << 8) & 0xFF00) + ((payload_bytes[index]) & 0xFF)
-		index += 2
-		payload_length -= 2
+	if payload:
+		# change to bytearray
+		payload_bytes = bytearray(payload, encoding='utf-8')
 
-	if payload_length > 0:
-		total += (payload_bytes[index] & 0xFF)
+		payload_length = len(payload_bytes)
 
-	while (total >> 16) > 0:
-		total = (total & 0xFFFF) + (total >> 16)
+		# loop through the payload to add to total
+		for i in range(0, payload_length, 2):
+			# bit shift left 8 (+256)
+			total += (payload_bytes[i] << 8)  + (payload_bytes[i+1])
 
-	# get the 1's compliment
-	total = ~total & 0xFFFF
+		# total = (total & 0xFFFF) + (total >> 16)
+
+		# get the 1's compliment
+		total = ~total & 0xFFFF
 
 	return total 
 

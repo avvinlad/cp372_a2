@@ -1,7 +1,7 @@
 from common import *
 
 class receiver:
-    
+
     def isCorrupted(self, packet):
         ''' Checks if a received packet has been corrupted during transmission.
         Return true if computed checksum is different than packet checksum.'''
@@ -14,9 +14,8 @@ class receiver:
     
     def getNextExpectedSeqNum(self):
         '''The expected sequence numbers are 0 or 1'''
-        
 
-        return
+        return 0
 
     
     def __init__(self, entityName, ns):
@@ -27,6 +26,7 @@ class receiver:
 
     def init(self):
         '''initialize expected sequence number'''
+
         return
          
 
@@ -46,6 +46,11 @@ class receiver:
 
         # if everything is ok we deliver data back to sender
         self.networkSimulator.deliverData(self.entity, packet)
+        seqNum = self.getNextExpectedSeqNum()
+        checkSum = checksumCalc('')
+        b_packet = Packet(seqNum, 1, checkSum)
+        
+        self.networkSimulator.udtSend(self.entity, b_packet)
         
 
         return
